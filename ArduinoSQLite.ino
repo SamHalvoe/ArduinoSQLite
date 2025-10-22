@@ -1,8 +1,11 @@
 #include <Arduino.h>
 
 #include "./src/ArduinoSQLite.hpp"
+#include "./test/MemoryInfo.hpp"
 
 #include <SD.h>
+
+namespace memInfo = halvoe::memoryInfo;
 
 const char* dbName = "test.db";
 const char* dbJournalName = "test.db-journal";
@@ -42,12 +45,23 @@ void checkSQLiteError(sqlite3* in_db, int in_rc)
   }
 }
 
+void printMemoryInfo()
+{
+  Serial.printf("getUsedStackInBytes(): %d\n", memInfo::getUsedStackInBytes());
+  //Serial.printf("getAvailableStackInBytes(): %d\n", memInfo::getAvailableStackInBytes());
+  Serial.printf("getUsedHeapInBytes(): %d\n", memInfo::getUsedHeapInBytes());
+  //Serial.printf("getAvailableHeapInBytes(): %d\n", memInfo::getAvailableHeapInBytes());
+  Serial.printf("getUsedPsramInBytes(): %d\n", memInfo::getUsedPsramInBytes());
+  //Serial.printf("getAvailablePsramInBytes(): %d\n", memInfo::getAvailablePsramInBytes());
+}
+
 void testSQLite()
 {
   sqlite3* db;
   Serial.println("---- testSQLite - sqlite3_open - begin ----");
   int rc = sqlite3_open("test.db", &db);
   checkSQLiteError(db, rc);
+  printMemoryInfo();
   Serial.println("---- testSQLite - sqlite3_open - end ----");
 
   if (rc == SQLITE_OK)
@@ -55,17 +69,20 @@ void testSQLite()
     Serial.println("---- testSQLite - sqlite3_exec - begin ----");
     rc = sqlite3_exec(db, "CREATE TABLE Persons(PersonID INT);", NULL, 0, NULL);
     checkSQLiteError(db, rc);
+    printMemoryInfo();
     Serial.println("---- testSQLite - sqlite3_exec - end ----");
 
     Serial.println("---- testSQLite - sqlite3_exec - begin ----");
     rc = sqlite3_exec(db, "INSERT INTO Persons (PersonID) VALUES (127);", NULL, 0, NULL);
     checkSQLiteError(db, rc);
+    printMemoryInfo();
     Serial.println("---- testSQLite - sqlite3_exec - end ----");
 
     Serial.println("---- testSQLite - sqlite3_prepare_v2 - begin ----");
     sqlite3_stmt* stmt;
     rc = sqlite3_prepare_v2(db, "SELECT * FROM Persons;", -1, &stmt, 0); // create SQL statement
     checkSQLiteError(db, rc);
+    printMemoryInfo();
     Serial.println("---- testSQLite - sqlite3_prepare_v2 - end ----");
     Serial.println("---- testSQLite - sqlite3_step - begin ----");
     rc = sqlite3_step(stmt);
@@ -77,22 +94,26 @@ void testSQLite()
     {
       checkSQLiteError(db, rc);
     }
+    printMemoryInfo();
     Serial.println("---- testSQLite - sqlite3_step - end ----");
     Serial.println("---- testSQLite - sqlite3_finalize - begin ----");
     rc = sqlite3_finalize(stmt);
     checkSQLiteError(db, rc);
+    printMemoryInfo();
     Serial.println("---- testSQLite - sqlite3_finalize - end ----");
   }
 
   Serial.println("---- testSQLite - sqlite3_close - begin ----");
   rc = sqlite3_close(db);
   checkSQLiteError(db, rc);
+  printMemoryInfo();
   Serial.println("---- testSQLite - sqlite3_close - end ----");
 }
 
 void setup()
 {
   setupSerial(115200);
+  printMemoryInfo();
 
   if (not SD.begin(BUILTIN_SDCARD))
   {
@@ -100,15 +121,16 @@ void setup()
     while (true) { delay(1000); }
   }
 
-  if (SD.exists(dbName)) { if (not SD.remove(dbName)) { Serial.printf("Remove %s failed!", dbName); } }
-  if (SD.exists(dbJournalName)) { if (not SD.remove(dbJournalName)) { Serial.printf("Remove %s failed!", dbJournalName); } }
+  if (SD.exists(dbName)) { if (not SD.remove(dbName)) { Serial.printf("Remove %s failed!\n", dbName); } }
+  if (SD.exists(dbJournalName)) { if (not SD.remove(dbJournalName)) { Serial.printf("Remove %s failed!\n", dbJournalName); } }
 
   T41SQLite::getInstance().setLogCallback(errorLogCallback);
-  int resultBegin = T41SQLite::getInstance().begin(&SD);
+  int resultBegin = T41SQLite::getInstance().begin(&SD, true);
 
   if (resultBegin == SQLITE_OK)
   {
     Serial.println("T41SQLite::getInstance().begin() succeded!");
+    printMemoryInfo();
 
     testSQLite();
 
@@ -123,6 +145,8 @@ void setup()
       Serial.print("T41SQLite::getInstance().end() failed! result code: ");
       Serial.println(resultEnd);
     }
+
+    printMemoryInfo();
   }
   else
   {

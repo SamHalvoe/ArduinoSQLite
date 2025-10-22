@@ -1,7 +1,16 @@
 #include "ArduinoSQLite.hpp"
+#include "ArduinoSQLiteEXTMEM.hpp"
 
-int T41SQLite::begin(FS* io_filesystem)
+int T41SQLite::begin(FS* io_filesystem, bool in_useEXTMEM)
 {
+  if (in_useEXTMEM)
+  {
+    if (int result = sqlite3_use_extmem(); result != SQLITE_OK)
+    {
+      return result;
+    }
+  }
+
   m_filesystem = io_filesystem;
   return sqlite3_initialize();
 }

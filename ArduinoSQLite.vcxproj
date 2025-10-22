@@ -84,16 +84,20 @@
       <FileType>CppCode</FileType>
       <DeploymentContent>true</DeploymentContent>
     </ClCompile>
+    <ClCompile Include="src\ArduinoSQLiteEXTMEM.cpp" />
     <ClCompile Include="src\ArduinoSQLite_impl.cpp" />
     <ClCompile Include="src\ArduinoSQLite_vfs.cpp" />
     <ClCompile Include="src\sqlite3.c" />
+    <ClCompile Include="test\MemoryInfo.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectCapability Include="VisualMicro" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ArduinoSQLite.hpp" />
+    <ClInclude Include="src\ArduinoSQLiteEXTMEM.hpp" />
     <ClInclude Include="src\sqlite3.h" />
+    <ClInclude Include="test\MemoryInfo.hpp" />
     <ClInclude Include="__vm\.ArduinoSQLite.vsarduino.h" />
   </ItemGroup>
   <ItemGroup>

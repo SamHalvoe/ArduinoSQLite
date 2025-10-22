@@ -33,7 +33,7 @@ class T41SQLite
       return instance;
     }
 
-    int begin(FS* io_filesystem);
+    int begin(FS* io_filesystem, bool in_useEXTMEM = false);
     int end();
     
     FS* getFilesystem();

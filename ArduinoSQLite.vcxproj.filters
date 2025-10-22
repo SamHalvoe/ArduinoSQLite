@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>xml;json;txt;rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="test">
+      <UniqueIdentifier>{b2b302f6-acfa-47eb-9507-b9e3943858a2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ArduinoSQLite.ino" />
@@ -25,6 +28,12 @@
     <ClCompile Include="src\sqlite3.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="test\MemoryInfo.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ArduinoSQLiteEXTMEM.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="__vm\.ArduinoSQLite.vsarduino.h">
@@ -34,6 +43,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\sqlite3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="test\MemoryInfo.hpp">
+      <Filter>test</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ArduinoSQLiteEXTMEM.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
