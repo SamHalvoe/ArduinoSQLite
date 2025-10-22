@@ -111,7 +111,7 @@
 #include <Arduino.h>
 
 #include <assert.h>
-#include <ctime>
+#include <TimeLib.h>
 
 #include "ArduinoSQLite.hpp"
 
@@ -456,12 +456,12 @@ static int teensyFileControl(sqlite3_file *pFile, int op, void *pArg)
 */
 static int teensySectorSize(sqlite3_file *pFile)
 {
-  return T41SQLite::getInstance().getSectorSize();
+  return 0;
 }
 
 static int teensyDeviceCharacteristics(sqlite3_file *pFile)
 {
-  return T41SQLite::getInstance().getDeviceCharacteristics();
+  return 0;
 }
 
 /*
@@ -661,9 +661,8 @@ static int teensyRandomness(sqlite3_vfs *pVfs, int nByte, char *zByte)
 */
 static int teensySleep(sqlite3_vfs *pVfs, int nMicro)
 {
-  elapsedMicros elapsedMicroseconds;
   delayMicroseconds(nMicro);
-  return elapsedMicroseconds;
+  return nMicro;
 }
 
 /*
@@ -679,7 +678,7 @@ static int teensySleep(sqlite3_vfs *pVfs, int nMicro)
 */
 static int teensyCurrentTime(sqlite3_vfs *pVfs, double *pTime)
 {
-  time_t t = std::time(nullptr);
+  time_t t = now();
   *pTime = t/86400.0 + 2440587.5; 
   return SQLITE_OK;
 }

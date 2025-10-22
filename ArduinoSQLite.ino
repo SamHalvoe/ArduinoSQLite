@@ -22,26 +22,6 @@ void setupSerial(long in_serialBaudrate, unsigned long in_timeoutInSeconds = 15)
   }
 }
 
-void delaySetup(uint8_t in_seconds)
-{
-  Serial.print("Delay setup by ");
-  Serial.print(in_seconds);
-  Serial.print(" seconds: ");
-
-  for (uint8_t seconds = 0; seconds < in_seconds; ++seconds)
-  {
-    if (seconds % 5 == 0)
-    {
-      Serial.print(" ");
-    }
-
-    delay(1000);
-    Serial.print(".");
-  }
-
-  Serial.println(" Continue setup!");
-}
-
 void errorLogCallback(void* pArg, int iErrCode, const char* zMsg)
 {
   Serial.printf("(%d) %s\n", iErrCode, zMsg);
@@ -113,7 +93,6 @@ void testSQLite()
 void setup()
 {
   setupSerial(115200);
-  delaySetup(3);
 
   if (not SD.begin(BUILTIN_SDCARD))
   {

@@ -16,8 +16,6 @@ class T41SQLite
     static const int ACCESS_SUCCESFUL = 1;
     
   private:
-    int m_sectorSize = 0;
-    int m_deviceCharacteristics = 0;
     FS* m_filesystem = nullptr;
     String m_dbDirFullpath = "/";
 
@@ -44,15 +42,6 @@ class T41SQLite
     const String& getDBDirFullPath() const;
 
     int setLogCallback(LogCallback in_callback, void* in_forUseInCallback = nullptr);
-
-    void resetSectorSize();
-    void setSectorSize(int in_size);
-    int getSectorSize() const;
-
-    bool assumeSingleSectorWriteIsAtomic();
-    void resetDeviceCharacteristics();
-    void setDeviceCharacteristics(int in_ioCap);
-    int getDeviceCharacteristics() const;
 };
 
 //#define TEENSY_41_SQLITE_DEBUG
