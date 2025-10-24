@@ -20,19 +20,19 @@ using SizeHeaderType = uint32_t; // sizeof(uint32_t) == 4 bytes
 
 static inline void* excludeHeader(void* in_pointer)
 {
-  return static_cast<void*>(++static_cast<SizeHeaderType*>(in_pointer));
+  return static_cast<void*>(static_cast<SizeHeaderType*>(in_pointer) + 1);
 }
 
 static inline void* includeHeader(void* in_pointer)
 {
-  return static_cast<void*>(--static_cast<SizeHeaderType*>(in_pointer));
+  return static_cast<void*>(static_cast<SizeHeaderType*>(in_pointer) - 1);
 }
 
 // SQLite malloc wrapper for EXTMEM
 static void* sqlite3_extmem_malloc(int in_size)
 {
   Serial.println("sqlite3_extmem_malloc");
-  void* pointer = extmem_malloc(c_sizeHeaderSize + in_size);
+  void* pointer = extmem_malloc(sizeof(SizeHeaderType) + in_size);
   *static_cast<SizeHeaderType*>(pointer) = static_cast<SizeHeaderType>(in_size);
   return excludeHeader(pointer);
 }
@@ -48,7 +48,7 @@ static void sqlite3_extmem_free(void* in_pointer)
 static void* sqlite3_extmem_realloc(void* in_pointer, int in_newSize)
 {
   Serial.println("sqlite3_extmem_realloc");
-  return extmem_realloc(includeHeader(in_pointer), in_newSize);
+  return extmem_realloc(includeHeader(in_pointer), sizeof(SizeHeaderType) + in_newSize);
 }
 
 // Return the size of an allocation
@@ -56,7 +56,7 @@ static int sqlite3_extmem_size(void* in_pointer)
 {
   Serial.println("sqlite3_extmem_size");
   if (in_pointer == nullptr) { return 0; }
-  return static_cast<int>(*(--static_cast<SizeHeaderType*>(in_pointer)));
+  return static_cast<int>(*(static_cast<SizeHeaderType*>(in_pointer) - 1));
 }
 
 // Round up request size to allocation size

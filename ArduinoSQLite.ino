@@ -113,6 +113,12 @@ void testSQLite()
 void setup()
 {
   setupSerial(115200);
+
+  if (CrashReport)
+  {
+    Serial.println(CrashReport);
+  }
+
   printMemoryInfo();
 
   if (not SD.begin(BUILTIN_SDCARD))
