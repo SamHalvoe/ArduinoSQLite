@@ -1,62 +1,35 @@
 #include <Arduino.h> // for: Teensy extmem functions
 
+#include <smalloc.h> // for: sm_szalloc_pool(&extmem_smalloc_pool, in_pointer) /* get size of allocation */
+
 #include "sqlite3.h" // for: SQLite related stuff
-
-/* This information may be useful (from SQLite documentation):
-
-**** The default memory allocator ****
-
-By default, SQLite uses the malloc(), realloc(), and free() routines from the standard C library for its memory allocation needs.
-These routines are surrounded by a thin wrapper that also provides a "memsize()" function that will return the size of an existing allocation.
-The memsize() function is needed to keep an accurate count of the number of bytes of outstanding memory; memsize() determines how many bytes to remove from the outstanding count when an allocation is freed.
-The default allocator implements memsize() by always allocating 8 extra bytes on each malloc() request and storing the size of the allocation in that 8-byte header.
-
-*/
-
-// Our allocator implements memsize() (=> sqlite3_extmem_size()) by always allocating 4 extra bytes
-// on each malloc() request and storing the size of the allocation in that 4-byte header.
-// => SizeHeaderType is the type for storing the size of the allocation, at the beginning of the allocation.
-using SizeHeaderType = uint32_t; // sizeof(uint32_t) == 4 bytes
-
-static inline void* excludeHeader(void* in_pointer)
-{
-  return static_cast<void*>(static_cast<SizeHeaderType*>(in_pointer) + 1);
-}
-
-static inline void* includeHeader(void* in_pointer)
-{
-  return static_cast<void*>(static_cast<SizeHeaderType*>(in_pointer) - 1);
-}
 
 // SQLite malloc wrapper for EXTMEM
 static void* sqlite3_extmem_malloc(int in_size)
 {
   Serial.println("sqlite3_extmem_malloc");
-  void* pointer = extmem_malloc(sizeof(SizeHeaderType) + in_size);
-  *static_cast<SizeHeaderType*>(pointer) = static_cast<SizeHeaderType>(in_size);
-  return excludeHeader(pointer);
+  return extmem_malloc(in_size);
 }
 
 // SQLite free wrapper for EXTMEM
 static void sqlite3_extmem_free(void* in_pointer)
 {
   Serial.println("sqlite3_extmem_free");
-  extmem_free(includeHeader(in_pointer));
+  extmem_free(in_pointer);
 }
 
 // SQLite realloc wrapper for EXTMEM
 static void* sqlite3_extmem_realloc(void* in_pointer, int in_newSize)
 {
   Serial.println("sqlite3_extmem_realloc");
-  return extmem_realloc(includeHeader(in_pointer), sizeof(SizeHeaderType) + in_newSize);
+  return extmem_realloc(in_pointer, in_newSize);
 }
 
 // Return the size of an allocation
 static int sqlite3_extmem_size(void* in_pointer)
 {
   Serial.println("sqlite3_extmem_size");
-  if (in_pointer == nullptr) { return 0; }
-  return static_cast<int>(*(static_cast<SizeHeaderType*>(in_pointer) - 1));
+  return static_cast<int>(sm_szalloc_pool(&extmem_smalloc_pool, in_pointer));
 }
 
 // Round up request size to allocation size

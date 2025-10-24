@@ -52,7 +52,7 @@ void printMemoryInfo()
   Serial.printf("getUsedHeapInBytes(): %d\n", memInfo::getUsedHeapInBytes());
   //Serial.printf("getAvailableHeapInBytes(): %d\n", memInfo::getAvailableHeapInBytes());
   Serial.printf("getUsedPsramInBytes(): %d\n", memInfo::getUsedPsramInBytes());
-  //Serial.printf("getAvailablePsramInBytes(): %d\n", memInfo::getAvailablePsramInBytes());
+  Serial.printf("getAvailablePsramInBytes(): %d\n", memInfo::getAvailablePsramInBytes());
 }
 
 void testSQLite()
