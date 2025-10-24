@@ -7,35 +7,35 @@
 // SQLite malloc wrapper for EXTMEM
 static void* sqlite3_extmem_malloc(int in_size)
 {
-  Serial.println("sqlite3_extmem_malloc");
+  //Serial.println("sqlite3_extmem_malloc");
   return extmem_malloc(in_size);
 }
 
 // SQLite free wrapper for EXTMEM
 static void sqlite3_extmem_free(void* in_pointer)
 {
-  Serial.println("sqlite3_extmem_free");
+  //Serial.println("sqlite3_extmem_free");
   extmem_free(in_pointer);
 }
 
 // SQLite realloc wrapper for EXTMEM
 static void* sqlite3_extmem_realloc(void* in_pointer, int in_newSize)
 {
-  Serial.println("sqlite3_extmem_realloc");
+  //Serial.println("sqlite3_extmem_realloc");
   return extmem_realloc(in_pointer, in_newSize);
 }
 
 // Return the size of an allocation
 static int sqlite3_extmem_size(void* in_pointer)
 {
-  Serial.println("sqlite3_extmem_size");
+  //Serial.println("sqlite3_extmem_size");
   return static_cast<int>(sm_szalloc_pool(&extmem_smalloc_pool, in_pointer));
 }
 
 // Round up request size to allocation size
 static int sqlite3_extmem_roundup(int in_size)
 {
-  Serial.println("sqlite3_extmem_roundup");
+  //Serial.println("sqlite3_extmem_roundup");
   return in_size;
 }
 
