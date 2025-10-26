@@ -131,7 +131,7 @@ void setup()
   if (SD.exists(dbJournalName)) { if (not SD.remove(dbJournalName)) { Serial.printf("Remove %s failed!\n", dbJournalName); } }
 
   T41SQLite::getInstance().setLogCallback(errorLogCallback);
-  int resultBegin = T41SQLite::getInstance().begin(&SD, true);
+  int resultBegin = T41SQLite::getInstance().begin(&SD, false);
 
   if (resultBegin == SQLITE_OK)
   {
