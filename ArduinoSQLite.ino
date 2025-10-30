@@ -48,11 +48,8 @@ void checkSQLiteError(sqlite3* in_db, int in_rc)
 void printMemoryInfo()
 {
   Serial.printf("getUsedStackInBytes(): %d\n", memInfo::getUsedStackInBytes());
-  //Serial.printf("getAvailableStackInBytes(): %d\n", memInfo::getAvailableStackInBytes());
   Serial.printf("getUsedHeapInBytes(): %d\n", memInfo::getUsedHeapInBytes());
-  //Serial.printf("getAvailableHeapInBytes(): %d\n", memInfo::getAvailableHeapInBytes());
-  Serial.printf("getUsedPsramInBytes(): %d\n", memInfo::getUsedPsramInBytes());
-  Serial.printf("getAvailablePsramInBytes(): %d\n", memInfo::getAvailablePsramInBytes());
+  //Serial.printf("getDynamicUsedPsramInBytes(): %d\n", memInfo::getDynamicUsedPsramInBytes()); // expensive opration
 }
 
 void testSQLite()

@@ -2,6 +2,8 @@
 
 #include <Arduino.h>
 
+// ToDo: Maybe add mallinfo(), see this thread https://forum.pjrc.com/index.php?threads/malloc-free-fails-to-aggregate-chunks-sometimes.77033/
+
 namespace halvoe::memoryInfo
 {
   // ---- memory infos about various memory regions ----
@@ -43,12 +45,28 @@ namespace halvoe::memoryInfo
   uint32_t getDtcmStart();
   uint32_t getDtcmEnd();
 
-#if ARDUINO_TEENSY41
-  uint32_t getPsramPointer();
-  uint32_t getPsramStart();
-  uint32_t getPsramEnd();
-  uint32_t getAvailablePsramInBytes();
-  uint32_t getUsedPsramInBytes();
+#ifdef ARDUINO_TEENSY41
+  // memory info about static allocated PSRAM
+  uint32_t getStaticPsramPointer();
+  uint32_t getStaticPsramStart();
+  uint32_t getStaticPsramEnd();
+  uint32_t getStaticAvailablePsramInBytes();
+  uint32_t getStaticUsedPsramInBytes();
+
+  // memory info about dynamic allocated PSRAM (external heap)
+  struct DynamicPSRAMInfo
+  {
+    size_t m_total = 0;
+    size_t m_used = 0;
+    size_t m_free = 0;
+    int m_blockCount = 0;
+  };
+
+  DynamicPSRAMInfo getDynamicPsramInfo();
+  size_t getDynamicPsramTotal();
+  size_t getDynamicUsedPsramInBytes();
+  size_t getDynamicAvailablePsramInBytes();
+  int getDynamicPsramBlockCount();
 #endif
   
   // ---- memory infos about variables, arrays and functions ----

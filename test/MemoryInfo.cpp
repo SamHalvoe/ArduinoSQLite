@@ -1,12 +1,14 @@
 #include "MemoryInfo.hpp"
 
+#include <smalloc.h>
+
 // note: these values are defined by the linker, they are not valid memory
 // locations in all cases - by defining them as arrays, the C++ compiler
 // will use the address of these definitions - it's a big hack, but there's
 // really no clean way to get at linker-defined symbols from the .ld file
 extern char _stext[], _etext[], _sbss[], _ebss[], _sdata[], _edata[], _estack[], _heap_start[], _heap_end[], _itcm_block_count[], * __brkval;
 
-#if ARDUINO_TEENSY41
+#ifdef ARDUINO_TEENSY41
 extern char _extram_start[], _extram_end[];
 extern "C" uint8_t external_psram_size;
 #endif
@@ -38,7 +40,7 @@ namespace halvoe::memoryInfo
 
   constexpr uint32_t getFlashSize()
   {
-#if ARDUINO_TEENSY40
+#ifdef ARDUINO_TEENSY40
     return 2 << 20;
 #elif ARDUINO_TEENSY41
     return 8 << 20;
@@ -161,29 +163,70 @@ namespace halvoe::memoryInfo
   }
 
 #if ARDUINO_TEENSY41
-  uint32_t getPsramPointer()
+  uint32_t getStaticPsramPointer()
   {
     return reinterpret_cast<uint32_t>(_extram_end);
   }
 
-  uint32_t getPsramStart()
+  uint32_t getStaticPsramStart()
   {
     return reinterpret_cast<uint32_t>(_extram_start);
   }
 
-  uint32_t getPsramEnd()
+  uint32_t getStaticPsramEnd()
   {
-    return external_psram_size > 0 ? (getPsramStart() + (external_psram_size << 20) - 1) : 0;
+    return external_psram_size > 0 ? (getStaticPsramStart() + (external_psram_size << 20) - 1) : 0;
   }
 
-  uint32_t getAvailablePsramInBytes()
+  uint32_t getStaticAvailablePsramInBytes()
   {
-    return external_psram_size > 0 ? (getPsramStart() + (external_psram_size << 20) - getPsramPointer()) : 0;
+    return external_psram_size > 0 ? (getStaticPsramStart() + (external_psram_size << 20) - getStaticPsramPointer()) : 0;
   }
 
-  uint32_t getUsedPsramInBytes()
+  uint32_t getStaticUsedPsramInBytes()
   {
-    return getPsramPointer() - getPsramStart();
+    return getStaticPsramPointer() - getStaticPsramStart();
+  }
+
+  DynamicPSRAMInfo getDynamicPsramInfo()
+  {
+    DynamicPSRAMInfo info;
+    sm_malloc_stats_pool(&extmem_smalloc_pool, &info.m_total, &info.m_used, &info.m_free, &info.m_blockCount);
+    return info;
+  }
+
+  size_t getDynamicPsramTotal()
+  {
+    size_t total = 0;
+    size_t free = 0;
+    sm_malloc_stats_pool(&extmem_smalloc_pool, &total, nullptr, &free, nullptr);
+    return total;
+  }
+
+  size_t getDynamicUsedPsramInBytes()
+  {
+    size_t total = 0;
+    size_t free = 0;
+    size_t used = 0;
+    sm_malloc_stats_pool(&extmem_smalloc_pool, &total, &used, &free, nullptr);
+    return total;
+  }
+
+  size_t getDynamicAvailablePsramInBytes()
+  {
+    size_t total = 0;
+    size_t free = 0;
+    sm_malloc_stats_pool(&extmem_smalloc_pool, &total, nullptr, &free, nullptr);
+    return free;
+  }
+
+  int getDynamicPsramBlockCount()
+  {
+    size_t total = 0;
+    size_t free = 0;
+    int blockCount = 0;
+    sm_malloc_stats_pool(&extmem_smalloc_pool, &total, nullptr, &free, &blockCount);
+    return blockCount;
   }
 #endif
   
@@ -201,7 +244,7 @@ namespace halvoe::memoryInfo
       info.m_endAddress = info.m_startAddress + info.m_size - 1;
       
 #if ARDUINO_TEENSY41
-      if (info.m_startAddress >= getPsramStart())
+      if (info.m_startAddress >= getStaticPsramStart())
 #else
       if (false)
 #endif
