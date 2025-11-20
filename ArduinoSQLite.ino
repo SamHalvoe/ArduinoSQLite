@@ -64,18 +64,30 @@ void testSQLite()
   if (rc == SQLITE_OK)
   {
     Serial.println("---- testSQLite - sqlite3_exec - begin ----");
-    rc = sqlite3_exec(db, "CREATE TABLE Persons(PersonID INT);", NULL, 0, NULL);
+    const char* sqlCreateTable = "CREATE TABLE Persons(PersonID INT);";
+    Serial.print("SQL to exec: \"");
+    Serial.print(sqlCreateTable);
+    Serial.println("\"");
+    rc = sqlite3_exec(db, sqlCreateTable, NULL, 0, NULL);
     checkSQLiteError(db, rc);
     printMemoryInfo();
     Serial.println("---- testSQLite - sqlite3_exec - end ----");
 
     Serial.println("---- testSQLite - sqlite3_exec - begin ----");
-    rc = sqlite3_exec(db, "INSERT INTO Persons (PersonID) VALUES (127);", NULL, 0, NULL);
+    const char* sqlInsert = "INSERT INTO Persons (PersonID) VALUES (127);";
+    Serial.print("SQL to exec: \"");
+    Serial.print(sqlInsert);
+    Serial.println("\"");
+    rc = sqlite3_exec(db, sqlInsert, NULL, 0, NULL);
     checkSQLiteError(db, rc);
     printMemoryInfo();
     Serial.println("---- testSQLite - sqlite3_exec - end ----");
 
     Serial.println("---- testSQLite - sqlite3_prepare_v2 - begin ----");
+    const char* sqlSelect = "SELECT * FROM Persons;";
+    Serial.print("SQL to prepare: \"");
+    Serial.print(sqlSelect);
+    Serial.println("\"");
     sqlite3_stmt* stmt;
     rc = sqlite3_prepare_v2(db, "SELECT * FROM Persons;", -1, &stmt, 0); // create SQL statement
     checkSQLiteError(db, rc);
@@ -85,6 +97,9 @@ void testSQLite()
     rc = sqlite3_step(stmt);
     if (rc == SQLITE_ROW)
     {
+      Serial.print("Result from SQL (");
+      Serial.print(sqlSelect);
+      Serial.println("): ");
       Serial.println(sqlite3_column_int(stmt, 0));
     }
     else
@@ -115,6 +130,9 @@ void setup()
   {
     Serial.println(CrashReport);
   }
+
+  Serial.print("SQLite Version: ");
+  Serial.println(SQLITE_VERSION);
 
   printMemoryInfo();
 
